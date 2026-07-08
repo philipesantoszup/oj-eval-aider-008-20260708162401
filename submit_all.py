@@ -11,28 +11,25 @@ def submit_problems():
         print("Error: ACMOJ_TOKEN environment variable not set.")
         return
 
-    # Handle case where PROBLEMS might be a single comma-separated string
+    # Ensure we have a list of individual problem IDs
     if isinstance(PROBLEMS, str):
         problem_list = [p.strip() for p in PROBLEMS.split(",") if p.strip()]
     else:
         problem_list = PROBLEMS
 
     for pid in problem_list:
-        # Ensure pid is a single problem ID string and not a list/comma-separated string
-        pid = pid.strip()
-        if not pid:
-            continue
-        
-        if ',' in pid:
-            print(f"Error: pid '{pid}' contains commas. Splitting and processing...")
+        # Extra safety: if an element in the list still contains commas, split it
+        if isinstance(pid, str) and ',' in pid:
             sub_pids = [p.strip() for p in pid.split(',')]
             for spid in sub_pids:
                 submit_single_problem(spid)
-            continue
-        
-        submit_single_problem(pid)
+        else:
+            submit_single_problem(pid)
 
 def submit_single_problem(pid):
+    if not pid:
+        return
+    
     file_path = f"code/{pid}.mv"
     if not os.path.exists(file_path):
         print(f"Skipping {pid}: {file_path} not found.")
@@ -43,7 +40,7 @@ def submit_single_problem(pid):
         "python3", CLIENT_PATH,
         "--token", TOKEN,
         "submit",
-        "--problem-id", pid,
+        "--problem-id", str(pid),
         "--language", "mov",
         "--code-file", file_path
     ]
