@@ -17,8 +17,12 @@ def submit_problems():
         problem_list = [p.strip() for p in PROBLEMS.split(",") if p.strip()]
     elif isinstance(PROBLEMS, list):
         for item in PROBLEMS:
-            if isinstance(item, str) and ',' in item:
-                problem_list.extend([p.strip() for p in item.split(",") if p.strip()])
+            if isinstance(item, str):
+                # Split if the string contains commas
+                if ',' in item:
+                    problem_list.extend([p.strip() for p in item.split(",") if p.strip()])
+                else:
+                    problem_list.append(item)
             else:
                 problem_list.append(str(item))
 
@@ -29,6 +33,11 @@ def submit_single_problem(pid):
     if not pid:
         return
     
+    # Extra safety: if pid still contains a comma, it's an error in the loop logic
+    if ',' in pid:
+        print(f"Error: pid '{pid}' contains commas. It should be a single ID.")
+        return
+
     file_path = f"code/{pid}.mv"
     if not os.path.exists(file_path):
         print(f"Skipping {pid}: {file_path} not found.")
