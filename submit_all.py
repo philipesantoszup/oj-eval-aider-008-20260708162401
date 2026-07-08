@@ -11,7 +11,7 @@ def submit_problems():
         print("Error: ACMOJ_TOKEN environment variable not set.")
         return
 
-    # Normalize PROBLEMS into a list of strings
+    # Ensure we have a list of individual problem IDs
     problem_list = []
     if isinstance(PROBLEMS, str):
         problem_list = [p.strip() for p in PROBLEMS.split(",") if p.strip()]
@@ -39,7 +39,7 @@ def submit_single_problem(pid):
         "python3", CLIENT_PATH,
         "--token", TOKEN,
         "submit",
-        "--problem-id", str(pid),
+        "--problem-id", pid,
         "--language", "mov",
         "--code-file", file_path
     ]
