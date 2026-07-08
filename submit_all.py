@@ -11,7 +11,13 @@ def submit_problems():
         print("Error: ACMOJ_TOKEN environment variable not set.")
         return
 
-    for pid in PROBLEMS:
+    # Handle case where PROBLEMS might be a single comma-separated string
+    if isinstance(PROBLEMS, str):
+        problem_list = [p.strip() for p in PROBLEMS.split(",") if p.strip()]
+    else:
+        problem_list = PROBLEMS
+
+    for pid in problem_list:
         # Ensure pid is a single problem ID string
         pid = pid.strip()
         if not pid:
