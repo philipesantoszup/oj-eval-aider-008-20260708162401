@@ -11,20 +11,19 @@ def submit_problems():
         print("Error: ACMOJ_TOKEN environment variable not set.")
         return
 
-    # Ensure we have a list of individual problem IDs
+    # Normalize PROBLEMS into a list of strings
+    problem_list = []
     if isinstance(PROBLEMS, str):
         problem_list = [p.strip() for p in PROBLEMS.split(",") if p.strip()]
-    else:
-        problem_list = PROBLEMS
+    elif isinstance(PROBLEMS, list):
+        for item in PROBLEMS:
+            if isinstance(item, str) and ',' in item:
+                problem_list.extend([p.strip() for p in item.split(",") if p.strip()])
+            else:
+                problem_list.append(str(item))
 
     for pid in problem_list:
-        # Extra safety: if an element in the list still contains commas, split it
-        if isinstance(pid, str) and ',' in pid:
-            sub_pids = [p.strip() for p in pid.split(',')]
-            for spid in sub_pids:
-                submit_single_problem(spid)
-        else:
-            submit_single_problem(pid)
+        submit_single_problem(pid)
 
 def submit_single_problem(pid):
     if not pid:
