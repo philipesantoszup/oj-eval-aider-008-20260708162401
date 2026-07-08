@@ -18,34 +18,44 @@ def submit_problems():
         problem_list = PROBLEMS
 
     for pid in problem_list:
-        # Ensure pid is a single problem ID string
+        # Ensure pid is a single problem ID string and not a list/comma-separated string
         pid = pid.strip()
         if not pid:
             continue
-            
-        file_path = f"code/{pid}.mv"
-        if not os.path.exists(file_path):
-            print(f"Skipping {pid}: {file_path} not found.")
+        
+        if ',' in pid:
+            print(f"Error: pid '{pid}' contains commas. Splitting and processing...")
+            sub_pids = [p.strip() for p in pid.split(',')]
+            for spid in sub_pids:
+                submit_single_problem(spid)
             continue
         
-        print(f"Submitting problem {pid}...")
-        cmd = [
-            "python3", CLIENT_PATH,
-            "--token", TOKEN,
-            "submit",
-            "--problem-id", pid,
-            "--language", "mov",
-            "--code-file", file_path
-        ]
-        
-        try:
-            result = subprocess.run(cmd, capture_output=True, text=True)
-            if result.returncode == 0:
-                print(f"Successfully submitted {pid}: {result.stdout}")
-            else:
-                print(f"Failed to submit {pid}: {result.stderr}")
-        except Exception as e:
-            print(f"An error occurred while submitting {pid}: {e}")
+        submit_single_problem(pid)
+
+def submit_single_problem(pid):
+    file_path = f"code/{pid}.mv"
+    if not os.path.exists(file_path):
+        print(f"Skipping {pid}: {file_path} not found.")
+        return
+    
+    print(f"Submitting problem {pid}...")
+    cmd = [
+        "python3", CLIENT_PATH,
+        "--token", TOKEN,
+        "submit",
+        "--problem-id", pid,
+        "--language", "mov",
+        "--code-file", file_path
+    ]
+    
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode == 0:
+            print(f"Successfully submitted {pid}: {result.stdout}")
+        else:
+            print(f"Failed to submit {pid}: {result.stderr}")
+    except Exception as e:
+        print(f"An error occurred while submitting {pid}: {e}")
 
 if __name__ == "__main__":
     submit_problems()
