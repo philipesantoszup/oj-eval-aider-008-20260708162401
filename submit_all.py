@@ -12,6 +12,11 @@ def submit_problems():
         return
 
     for pid in PROBLEMS:
+        # Ensure pid is a single problem ID string
+        pid = pid.strip()
+        if not pid:
+            continue
+            
         file_path = f"code/{pid}.mv"
         if not os.path.exists(file_path):
             print(f"Skipping {pid}: {file_path} not found.")
