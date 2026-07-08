@@ -11,18 +11,14 @@ def submit_problems():
         print("Error: ACMOJ_TOKEN environment variable not set.")
         return
 
-    # Normalize PROBLEMS into a list of strings
+    # Normalize PROBLEMS into a flat list of strings
     problem_list = []
     if isinstance(PROBLEMS, str):
         problem_list = [p.strip() for p in PROBLEMS.split(",") if p.strip()]
     elif isinstance(PROBLEMS, list):
         for item in PROBLEMS:
-            if isinstance(item, str):
-                # Split if the string contains commas
-                if ',' in item:
-                    problem_list.extend([p.strip() for p in item.split(",") if p.strip()])
-                else:
-                    problem_list.append(item)
+            if isinstance(item, str) and ',' in item:
+                problem_list.extend([p.strip() for p in item.split(",") if p.strip()])
             else:
                 problem_list.append(str(item))
 
@@ -33,9 +29,11 @@ def submit_single_problem(pid):
     if not pid:
         return
     
-    # Extra safety: if pid still contains a comma, it's an error in the loop logic
+    # Ensure pid is a single ID and not a comma-separated list
     if ',' in pid:
-        print(f"Error: pid '{pid}' contains commas. It should be a single ID.")
+        print(f"Error: pid '{pid}' contains commas. Splitting and retrying...")
+        for sub_pid in [p.strip() for p in pid.split(",") if p.strip()]:
+            submit_single_problem(sub_pid)
         return
 
     file_path = f"code/{pid}.mv"
